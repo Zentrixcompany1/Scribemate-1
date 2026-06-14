@@ -23,8 +23,8 @@
           <% exams.forEach(function(exam) { %>
             <tr>
               <td><%= exam.title %></td>
-              <td><%= exam.assignedStudentIds.length %></td>
-              <td><%= new Date(exam.createdAt).toLocaleDateString() %></td>
+              <td><%= Array.isArray(exam.assigned_student_ids) ? exam.assigned_student_ids.length : 0 %></td>
+              <td><%= new Date(exam.created_at).toLocaleDateString() %></td>
               <td><a href="/teacher/exams/<%= exam.id %>" class="button button-tertiary">View</a></td>
             </tr>
           <% }) %>

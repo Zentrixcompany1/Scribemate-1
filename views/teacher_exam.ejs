@@ -14,7 +14,7 @@
           <li><%= question %></li>
         <% }) %>
       </ol>
-      <p><strong>Assigned students:</strong> <%= exam.assignedStudentIds.length %></p>
+      <p><strong>Assigned students:</strong> <%= Array.isArray(exam.assigned_student_ids) ? exam.assigned_student_ids.length : 0 %></p>
     </div>
     <% if (submissions.length === 0) { %>
       <div class="info-box">No student answers have been submitted yet.</div>
@@ -31,10 +31,9 @@
           </thead>
           <tbody>
             <% submissions.slice(-8).reverse().forEach(function(submission) { %>
-              <% const student = findUserById(submission.studentId); %>
-              <tr>
-                <td><%= student ? student.name : 'Unknown' %></td>
-                <td><%= new Date(submission.submittedAt).toLocaleString() %></td>
+                <tr>
+                <td><%= submission.student_name %></td>
+                <td><%= new Date(submission.submitted_at).toLocaleString() %></td>
                 <td><a href="/download/<%= submission.id %>" class="button button-tertiary">Download</a></td>
               </tr>
             <% }) %>

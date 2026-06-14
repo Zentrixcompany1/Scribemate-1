@@ -15,7 +15,7 @@
       </div>
       <div class="card">
         <h2>Submissions</h2>
-        <p><strong><%= submissions.length %></strong> submission(s) received</p>
+        <p><strong><%= submissionsCount %></strong> submission(s) received</p>
         <a href="/teacher/exams" class="button button-secondary">Review submissions</a>
       </div>
     </div>
@@ -36,12 +36,11 @@
           </tr>
         </thead>
         <tbody>
-          <% submissions.slice(-6).reverse().forEach(function(submission) { %>
-            <% const student = findUserById(submission.studentId); const exam = exams.find((item) => item.id === submission.examId); %>
+          <% submissions.forEach(function(submission) { %>
             <tr>
-              <td><%= student ? student.name : 'Unknown' %></td>
-              <td><%= exam ? exam.title : 'Unknown exam' %></td>
-              <td><%= new Date(submission.submittedAt).toLocaleString() %></td>
+              <td><%= submission.student_name %></td>
+              <td><%= submission.exam_title %></td>
+              <td><%= new Date(submission.submitted_at).toLocaleString() %></td>
               <td><a href="/download/<%= submission.id %>" class="button button-tertiary">Download</a></td>
             </tr>
           <% }) %>
