@@ -285,12 +285,20 @@ function renderExamTable(exams) {
 
 async function renderStudentExamTable(exams) {
   const tbody = document.querySelector('#student-exam-table tbody');
+  const completed = exams.filter((e) => e.submitted).length;
+  const pending = exams.length - completed;
+
+  document.getElementById('student-exam-count').textContent = exams.length;
+  document.getElementById('student-completed-count').textContent = completed;
+  document.getElementById('student-pending-count').textContent = pending;
+
   tbody.innerHTML = exams
     .map((exam) => {
-      const status = exam.submitted ? 'Pending' : 'Open';
-      return `<tr><td>${escapeHtml(exam.title)}</td><td>${status}</td><td><button class="button button-tertiary" data-exam-id="${exam.id}">Open</button></td></tr>`;
+      const status = exam.submitted ? '<span style="color: #4ade80;">Submitted</span>' : '<span style="color: var(--primary);">Available</span>';
+      const createdDate = new Date(exam.created_at).toLocaleDateString();
+      return `<tr><td>${escapeHtml(exam.title)}</td><td>${createdDate}</td><td>${status}</td><td><button class="button button-primary" data-exam-id="${exam.id}" style="padding: 8px 16px; font-size: 0.9rem;">Take Exam</button></td></tr>`;
     })
-    .join('') || '<tr><td colspan="3">No assigned exams yet.</td></tr>';
+    .join('') || '<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--text-secondary);">No exams assigned yet. Your teacher will assign exams here.</td></tr>';
 
   tbody.querySelectorAll('button[data-exam-id]').forEach((button) => {
     button.addEventListener('click', async (event) => {
@@ -319,9 +327,24 @@ async function openStudentExam(examId) {
   }
   currentExam = exam;
   document.getElementById('exam-detail-title').textContent = exam.title;
-  document.getElementById('exam-detail-description').textContent = exam.description || 'No description provided.';
-  const questions = document.getElementById('exam-detail-questions');
-  questions.innerHTML = (exam.questions || []).map((q) => `<li>${escapeHtml(q)}</li>`).join('');
+  document.getElementById('exam-detail-description').textContent = exam.description || 'Instructions will appear here.';
+  
+  const questionsInfo = document.getElementById('exam-questions-info');
+  const questionsList = document.getElementById('exam-questions-list');
+  
+  if (exam.questions) {
+    questionsInfo.style.display = 'none';
+    questionsList.style.display = 'block';
+    questionsList.innerHTML = exam.questions
+      .split('\n')
+      .map((q) => q.trim())
+      .filter(Boolean)
+      .map((q) => `<li>${escapeHtml(q)}</li>`)
+      .join('');
+  } else {
+    questionsInfo.style.display = 'block';
+    questionsList.style.display = 'none';
+  }
 
   const { data: submission } = await supabaseClient
     .from('submissions')
@@ -338,14 +361,28 @@ async function handleCreateExam(event) {
   event.preventDefault();
   const title = document.getElementById('exam-title').value.trim();
   const description = document.getElementById('exam-description').value.trim();
-  const questions = document
-    .getElementById('exam-questions')
-    .value.split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const questionsFile = document.getElementById('exam-questions-file').files[0];
 
-  if (!title || !questions.length) {
-    showToast('Enter exam title and at least one question.');
+  if (!title) {
+    showToast('Enter exam title.');
+    return;
+  }
+
+  if (!questionsFile) {
+    showToast('Upload a questions file (PDF, DOC, DOCX, or TXT).');
+    return;
+  }
+
+  let questionsText = '';
+  try {
+    questionsText = await questionsFile.text();
+  } catch (err) {
+    showToast('Unable to read file. Please use a text-based format (TXT, PDF text, or DOC).');
+    return;
+  }
+
+  if (!questionsText.trim()) {
+    showToast('Questions file appears to be empty.');
     return;
   }
 
@@ -355,7 +392,7 @@ async function handleCreateExam(event) {
       id: crypto.randomUUID(),
       title,
       description,
-      questions,
+      questions: questionsText,
       teacher_id: currentProfile.id,
       assigned_student_ids: students.map((student) => student.id),
       created_at: new Date().toISOString(),
@@ -367,7 +404,7 @@ async function handleCreateExam(event) {
     return;
   }
 
-  showToast('Exam published to students.');
+  showToast('Examination published to all enrolled students.');
   document.getElementById('form-create-exam').reset();
   await loadTeacherDashboard();
 }
@@ -485,7 +522,7 @@ async function handleSubmitAnswer(event) {
       showToast('Unable to submit answer.');
       return;
     }
-    showToast('Answer submitted successfully.');
+    showToast('Your examination response has been submitted successfully.');
   }
 }
 

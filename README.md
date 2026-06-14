@@ -1,13 +1,16 @@
-# Scribemate
+# Scribe Exam Management System
 
-Scribemate is an accessible web application for teachers and students to manage exams, monitor answers, and download answer scripts.
+Scribe is a government-grade examination platform for educational institutions. Teachers create exams and manage student credentials; students take exams in a secure, professional environment with full question visibility and response submission.
 
 ## Features
-- Teacher login and teacher registration
-- Teacher dashboard for managing students and exams
-- Students are added by teachers and assigned automatically to exams
-- Student exam submission form with accessible layout
-- Teacher view of submissions and downloadable answer scripts
+- **Teacher Registration & Dashboard:** Teachers register and manage their institution's exams
+- **Student Enrollment:** Teachers create student accounts and provide credentials
+- **File-Based Exam Questions:** Upload exam questions as PDF, DOC, DOCX, or TXT files
+- **Automatic Assignment:** Students are auto-assigned to exams upon enrollment
+- **Professional Student Portal:** Students view assigned exams with exam metadata
+- **Secure Exam Taking:** Students read questions and submit written responses
+- **Response Management:** Teachers view and download all student responses
+- **Credential Control:** Only teacher-created students can access the system
 
 ## Run locally
 1. Open `config.js` and update `SUPABASE_URL` and `SUPABASE_ANON_KEY` with your Supabase project values.
@@ -50,13 +53,21 @@ create table submissions (
 );
 ```
 
-### Disable email confirmation (required for smooth signup)
+### Disable email confirmation (required)
 1. Go to your Supabase project dashboard
 2. Navigate to **Authentication** → **Providers** → **Email**
 3. Toggle **Confirm email** to OFF
 4. Save changes
 
-This allows users to sign up and log in immediately without waiting for email verification.
+**Important:** This setting is essential for smooth operation. Students receive login credentials from their teacher; they do not self-register.
+
+### File Upload Configuration
+The exam questions file should be in one of these formats:
+- **.txt** — Plain text (one question per line)
+- **.pdf** — PDF document (text-extractable)
+- **.doc / .docx** — Microsoft Word document
+
+The system extracts and displays the text content to students during the exam.
 
 ## Supabase row-level security (RLS)
 For the app to work correctly, enable RLS on each table and add these policies.

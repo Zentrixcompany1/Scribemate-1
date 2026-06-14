@@ -14,13 +14,13 @@
   <div class="app-shell">
     <header class="app-header">
       <div class="brand-panel">
-        <div class="brand-badge">✦ Scribemate Premium ✦</div>
-        <h1>Elegant Exam Management</h1>
-        <p class="subtitle">A sophisticated platform for educational excellence, designed for teachers and students who demand quality and precision.</p>
+        <div class="brand-badge">🎓 Scribe Exam Management System</div>
+        <h1>Government-Grade Examination Platform</h1>
+        <p class="subtitle">A secure, accessible examination platform designed for educational institutions. Teachers control student access; students take exams in a professional environment.</p>
         <div class="hero-badges">
-          <span>⚡ Enterprise Ready</span>
-          <span>🔒 Secure</span>
-          <span>⚙️ Intuitive</span>
+          <span>📄 File-Based Questions</span>
+          <span>🔐 Credential Management</span>
+          <span>📊 Full Exam Control</span>
         </div>
       </div>
       <nav class="top-nav">
@@ -109,13 +109,14 @@
               <label for="exam-title">Exam Title</label>
               <input id="exam-title" type="text" required />
 
-              <label for="exam-description">Description</label>
-              <textarea id="exam-description" rows="2"></textarea>
+              <label for="exam-description">Description & Instructions</label>
+              <textarea id="exam-description" rows="2" placeholder="Exam rules, duration, passing criteria, etc."></textarea>
 
-              <label for="exam-questions">Questions (one per line)</label>
-              <textarea id="exam-questions" rows="4" required></textarea>
+              <label for="exam-questions-file">Upload Questions (PDF or DOC)</label>
+              <input id="exam-questions-file" type="file" accept=".pdf,.doc,.docx,.txt" required />
+              <small style="color: var(--text-secondary); margin-top: -12px;">Upload a document containing all exam questions</small>
 
-              <button type="submit" class="button button-primary">Publish Exam</button>
+              <button type="submit" class="button button-primary">Create & Publish Exam</button>
             </form>
           </div>
         </div>
@@ -142,13 +143,28 @@
       </section>
 
       <section id="section-student" class="panel hidden">
-        <h2 style="color: var(--primary); margin-bottom: 32px; font-size: 1.8rem;">Your Exams</h2>
+        <h2 style="color: var(--primary); margin-bottom: 32px; font-size: 1.8rem;">Student Examination Portal</h2>
+
+        <div class="stats-grid">
+          <div class="card">
+            <span class="stat-label">Available Exams</span>
+            <strong id="student-exam-count">0</strong>
+          </div>
+          <div class="card">
+            <span class="stat-label">Completed</span>
+            <strong id="student-completed-count">0</strong>
+          </div>
+          <div class="card">
+            <span class="stat-label">Pending</span>
+            <strong id="student-pending-count">0</strong>
+          </div>
+        </div>
 
         <div class="section-block">
-          <h3>Available Exams</h3>
+          <h3>Assigned Examinations</h3>
           <table class="data-table" id="student-exam-table">
             <thead>
-              <tr><th>Exam</th><th>Status</th><th>Action</th></tr>
+              <tr><th>Exam Title</th><th>Assigned Date</th><th>Status</th><th>Action</th></tr>
             </thead>
             <tbody></tbody>
           </table>
@@ -161,19 +177,23 @@
             <h2 id="exam-detail-title" style="color: var(--primary); margin: 0 0 12px 0; font-size: 1.8rem;"></h2>
             <p id="exam-detail-description" class="subtitle"></p>
           </div>
-          <button id="back-to-student" class="button button-secondary">← Back</button>
+          <button id="back-to-student" class="button button-secondary">← Back to Exams</button>
         </div>
 
         <div class="section-block">
-          <h3>Instructions & Questions</h3>
-          <ol id="exam-detail-questions" class="question-list"></ol>
+          <h3>Exam Questions</h3>
+          <div id="exam-detail-questions" style="padding: 20px; background: rgba(212, 175, 55, 0.08); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 24px;">
+            <p id="exam-questions-info" style="color: var(--text-secondary); margin: 0; line-height: 1.6;">Questions will be displayed below. Read all questions carefully before starting your response.</p>
+            <ol id="exam-questions-list" class="question-list" style="display: none;"></ol>
+          </div>
         </div>
 
         <div class="section-block">
-          <h3>Your Response</h3>
+          <h3>Your Examination Response</h3>
           <form id="form-submit-answer" class="form-grid">
-            <textarea id="student-answer" placeholder="Enter your answer here..." rows="12" required></textarea>
-            <button type="submit" class="button button-primary" style="align-self: flex-start;">Submit Answer</button>
+            <label for="student-answer">Write your answer in the space below. You may format your response as needed.</label>
+            <textarea id="student-answer" placeholder="Enter your examination answer here. You can write in any format (essay, bullet points, etc.)..." rows="16" required></textarea>
+            <button type="submit" class="button button-primary" style="align-self: flex-start;">Submit Examination</button>
           </form>
         </div>
       </section>
