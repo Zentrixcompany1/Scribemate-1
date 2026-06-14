@@ -1,0 +1,35 @@
+<%- include('layout', { user: teacher, body: `
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h1>Exams</h1>
+        <p class="intro">Create new exam content and assign it directly to every student under your supervision.</p>
+      </div>
+      <a href="/teacher/exams/new" class="button button-primary">Create new exam</a>
+    </div>
+    <% if (exams.length === 0) { %>
+      <p>No exams published yet. Start by creating an exam.</p>
+    <% } else { %>
+      <table class="data-table" aria-label="Exam list">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Students assigned</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% exams.forEach(function(exam) { %>
+            <tr>
+              <td><%= exam.title %></td>
+              <td><%= exam.assignedStudentIds.length %></td>
+              <td><%= new Date(exam.createdAt).toLocaleDateString() %></td>
+              <td><a href="/teacher/exams/<%= exam.id %>" class="button button-tertiary">View</a></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </section>
+` }) %>

@@ -1,0 +1,46 @@
+<%- include('layout', { user: teacher, body: `
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h1><%= exam.title %></h1>
+        <p class="intro"><%= exam.description || 'No description provided.' %></p>
+      </div>
+      <a href="/teacher/submissions/<%= exam.id %>" class="button button-primary">View submissions</a>
+    </div>
+    <div class="section-block">
+      <h2>Questions</h2>
+      <ol class="question-list">
+        <% exam.questions.forEach(function(question) { %>
+          <li><%= question %></li>
+        <% }) %>
+      </ol>
+      <p><strong>Assigned students:</strong> <%= exam.assignedStudentIds.length %></p>
+    </div>
+    <% if (submissions.length === 0) { %>
+      <div class="info-box">No student answers have been submitted yet.</div>
+    <% } else { %>
+      <div class="section-block">
+        <h2>Recent submissions</h2>
+        <table class="data-table" aria-label="Exam submissions">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Submitted</th>
+              <th>Download</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% submissions.slice(-8).reverse().forEach(function(submission) { %>
+              <% const student = findUserById(submission.studentId); %>
+              <tr>
+                <td><%= student ? student.name : 'Unknown' %></td>
+                <td><%= new Date(submission.submittedAt).toLocaleString() %></td>
+                <td><a href="/download/<%= submission.id %>" class="button button-tertiary">Download</a></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+` }) %>

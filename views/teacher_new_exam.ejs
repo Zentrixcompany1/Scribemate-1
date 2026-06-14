@@ -1,0 +1,21 @@
+<%- include('layout', { user: teacher, body: `
+  <section class="panel">
+    <h1>Create New Exam</h1>
+    <p class="intro">Compose exam questions and publish them automatically to all your assigned students.</p>
+    <% if (error) { %>
+      <div class="alert alert-error" role="alert"><%= error %></div>
+    <% } %>
+    <form action="/teacher/exams/new" method="post" class="form-grid" aria-label="New exam form">
+      <label for="title">Exam title</label>
+      <input id="title" name="title" type="text" required />
+
+      <label for="description">Description</label>
+      <textarea id="description" name="description" rows="3"></textarea>
+
+      <label for="questions">Questions</label>
+      <textarea id="questions" name="questions" rows="8" placeholder="Enter one question per line" required></textarea>
+
+      <button type="submit" class="button button-primary">Publish exam</button>
+    </form>
+  </section>
+` }) %>
