@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scribemate</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>Scribemate</h1>
+        <p class="subtitle">Accessible exam platform for teachers and students</p>
+      </div>
+      <nav class="top-nav">
+        <button id="nav-login">Login</button>
+        <button id="nav-register">Register</button>
+        <button id="nav-dashboard" class="hidden">Dashboard</button>
+        <button id="nav-logout" class="hidden">Logout</button>
+      </nav>
+    </header>
+
+    <main class="main-content">
+      <section id="section-auth" class="panel">
+        <div class="auth-layout">
+          <div class="auth-card">
+            <h2>Teacher Login</h2>
+            <form id="form-login" class="form-grid">
+              <label for="login-email">Email</label>
+              <input id="login-email" type="email" required />
+
+              <label for="login-password">Password</label>
+              <input id="login-password" type="password" required />
+
+              <button type="submit" class="button button-primary">Login</button>
+            </form>
+          </div>
+
+          <div class="auth-card">
+            <h2>Teacher Register</h2>
+            <form id="form-register" class="form-grid">
+              <label for="register-name">Full name</label>
+              <input id="register-name" type="text" required />
+
+              <label for="register-email">Email</label>
+              <input id="register-email" type="email" required />
+
+              <label for="register-password">Password</label>
+              <input id="register-password" type="password" required />
+
+              <button type="submit" class="button button-secondary">Register</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-teacher" class="panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2>Teacher Dashboard</h2>
+            <p class="subtitle">Manage students, publish exams, and review submissions.</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="card">
+            <span class="stat-label">Students</span>
+            <strong id="teacher-student-count">0</strong>
+          </div>
+          <div class="card">
+            <span class="stat-label">Exams</span>
+            <strong id="teacher-exam-count">0</strong>
+          </div>
+          <div class="card">
+            <span class="stat-label">Submissions</span>
+            <strong id="teacher-submission-count">0</strong>
+          </div>
+        </div>
+
+        <div class="grid two-column gap-xl">
+          <div class="card">
+            <h3>Create New Student</h3>
+            <form id="form-create-student" class="form-grid">
+              <label for="student-name">Student name</label>
+              <input id="student-name" type="text" required />
+
+              <label for="student-email">Student email</label>
+              <input id="student-email" type="email" required />
+
+              <label for="student-password">Password</label>
+              <input id="student-password" type="password" required />
+
+              <label for="teacher-password">Your password</label>
+              <input id="teacher-password" type="password" required />
+
+              <button type="submit" class="button button-primary">Create student account</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>Publish Exam</h3>
+            <form id="form-create-exam" class="form-grid">
+              <label for="exam-title">Exam title</label>
+              <input id="exam-title" type="text" required />
+
+              <label for="exam-description">Description</label>
+              <textarea id="exam-description" rows="3"></textarea>
+
+              <label for="exam-questions">Questions (one per line)</label>
+              <textarea id="exam-questions" rows="8" required></textarea>
+
+              <button type="submit" class="button button-secondary">Publish exam</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <h3>Your students</h3>
+          <table class="data-table" id="teacher-student-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="section-block">
+          <h3>Your exams</h3>
+          <table class="data-table" id="teacher-exam-table">
+            <thead>
+              <tr><th>Title</th><th>Assigned</th><th>Created</th><th>Actions</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="section-student" class="panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2>Student Dashboard</h2>
+            <p class="subtitle">Open your assigned exams and submit your answer scripts.</p>
+          </div>
+        </div>
+
+        <div class="section-block">
+          <h3>Assigned exams</h3>
+          <table class="data-table" id="student-exam-table">
+            <thead>
+              <tr><th>Exam</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="section-exam-detail" class="panel hidden">
+        <div class="panel-header">
+          <div>
+            <h2 id="exam-detail-title"></h2>
+            <p id="exam-detail-description" class="subtitle"></p>
+          </div>
+          <button id="back-to-student" class="button button-tertiary">Back</button>
+        </div>
+
+        <div class="section-block">
+          <h3>Questions</h3>
+          <ol id="exam-detail-questions" class="question-list"></ol>
+        </div>
+
+        <div class="section-block">
+          <h3>Your answer script</h3>
+          <form id="form-submit-answer" class="form-grid">
+            <textarea id="student-answer" rows="10" required></textarea>
+            <button type="submit" class="button button-primary">Submit answer</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
+</body>
+</html>

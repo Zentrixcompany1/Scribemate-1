@@ -10,16 +10,13 @@ Scribemate is an accessible web application for teachers and students to manage 
 - Teacher view of submissions and downloadable answer scripts
 
 ## Run locally
-1. Create a `.env` file from `.env.example` with your Supabase credentials.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the app:
-   ```bash
-   npm start
-   ```
-4. Open the site at `http://localhost:3000`
+1. Open `config.js` and update `SUPABASE_URL` and `SUPABASE_ANON_KEY` with your Supabase project values.
+2. Open `index.html` directly in your browser, or use any static server.
+
+## Deploy with GitHub Pages
+1. Push this repository to GitHub.
+2. In repository settings, enable GitHub Pages from the `main` branch and root folder.
+3. Your live link will be available at `https://<your-username>.github.io/<repo-name>`.
 
 ## Supabase setup
 Create the following tables in your Supabase project:
