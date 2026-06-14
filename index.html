@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scribemate</title>
+  <meta name="description" content="Scribemate - Professional Exam Management Platform" />
+  <title>Scribemate | Premium Exam Management</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
@@ -13,20 +14,20 @@
   <div class="app-shell">
     <header class="app-header">
       <div class="brand-panel">
-        <div class="brand-badge">Scribemate</div>
-        <h1>Modern exam workflow for teachers and students</h1>
-        <p class="subtitle">Secure, accessible, and beautifully structured for classroom success.</p>
+        <div class="brand-badge">✦ Scribemate Premium ✦</div>
+        <h1>Elegant Exam Management</h1>
+        <p class="subtitle">A sophisticated platform for educational excellence, designed for teachers and students who demand quality and precision.</p>
         <div class="hero-badges">
-          <span>Multi-color UI</span>
-          <span>Live exam tracking</span>
-          <span>Easy student onboarding</span>
+          <span>⚡ Enterprise Ready</span>
+          <span>🔒 Secure</span>
+          <span>⚙️ Intuitive</span>
         </div>
       </div>
       <nav class="top-nav">
-        <button id="nav-login">Login</button>
+        <button id="nav-login">Sign In</button>
         <button id="nav-register">Register</button>
         <button id="nav-dashboard" class="hidden">Dashboard</button>
-        <button id="nav-logout" class="hidden">Logout</button>
+        <button id="nav-logout" class="hidden">Sign Out</button>
       </nav>
     </header>
 
@@ -34,98 +35,93 @@
       <section id="section-auth" class="panel">
         <div class="auth-layout">
           <div class="auth-card">
-            <h2>Teacher Login</h2>
+            <h2 style="color: var(--primary); margin-bottom: 24px; font-size: 1.4rem;">Educator Login</h2>
             <form id="form-login" class="form-grid">
-              <label for="login-email">Email</label>
-              <input id="login-email" type="email" required />
+              <label for="login-email">Email Address</label>
+              <input id="login-email" type="email" placeholder="your@email.com" required />
 
               <label for="login-password">Password</label>
-              <input id="login-password" type="password" required />
+              <input id="login-password" type="password" placeholder="••••••••" required />
 
-              <button type="submit" class="button button-primary">Login</button>
+              <button type="submit" class="button button-primary" style="margin-top: 12px;">Sign In</button>
             </form>
           </div>
 
           <div class="auth-card">
-            <h2>Teacher Register</h2>
+            <h2 style="color: var(--primary); margin-bottom: 24px; font-size: 1.4rem;">Create Account</h2>
             <form id="form-register" class="form-grid">
-              <label for="register-name">Full name</label>
-              <input id="register-name" type="text" required />
+              <label for="register-name">Full Name</label>
+              <input id="register-name" type="text" placeholder="John Educator" required />
 
-              <label for="register-email">Email</label>
-              <input id="register-email" type="email" required />
+              <label for="register-email">Email Address</label>
+              <input id="register-email" type="email" placeholder="your@email.com" required />
 
               <label for="register-password">Password</label>
-              <input id="register-password" type="password" required />
+              <input id="register-password" type="password" placeholder="••••••••" required />
 
-              <button type="submit" class="button button-secondary">Register</button>
+              <button type="submit" class="button button-primary" style="margin-top: 12px;">Create Account</button>
             </form>
           </div>
         </div>
       </section>
 
       <section id="section-teacher" class="panel hidden">
-        <div class="panel-header">
-          <div>
-            <h2>Teacher Dashboard</h2>
-            <p class="subtitle">Manage students, publish exams, and review submissions.</p>
-          </div>
-        </div>
+        <h2 style="color: var(--primary); margin-bottom: 32px; font-size: 1.8rem;">Teacher Command Center</h2>
 
         <div class="stats-grid">
           <div class="card">
-            <span class="stat-label">Students</span>
+            <span class="stat-label">Active Students</span>
             <strong id="teacher-student-count">0</strong>
           </div>
           <div class="card">
-            <span class="stat-label">Exams</span>
+            <span class="stat-label">Published Exams</span>
             <strong id="teacher-exam-count">0</strong>
           </div>
           <div class="card">
-            <span class="stat-label">Submissions</span>
+            <span class="stat-label">Total Submissions</span>
             <strong id="teacher-submission-count">0</strong>
           </div>
         </div>
 
         <div class="grid two-column gap-xl">
           <div class="card">
-            <h3>Create New Student</h3>
+            <h3>Enroll New Student</h3>
             <form id="form-create-student" class="form-grid">
-              <label for="student-name">Student name</label>
+              <label for="student-name">Student Name</label>
               <input id="student-name" type="text" required />
 
-              <label for="student-email">Student email</label>
+              <label for="student-email">Student Email</label>
               <input id="student-email" type="email" required />
 
-              <label for="student-password">Password</label>
+              <label for="student-password">Initial Password</label>
               <input id="student-password" type="password" required />
 
-              <label for="teacher-password">Your password</label>
+              <label for="teacher-password">Your Password (Verification)</label>
               <input id="teacher-password" type="password" required />
 
-              <button type="submit" class="button button-primary">Create student account</button>
+              <button type="submit" class="button button-primary">Create Student</button>
             </form>
           </div>
 
           <div class="card">
-            <h3>Publish Exam</h3>
+            <h3>Publish New Exam</h3>
             <form id="form-create-exam" class="form-grid">
-              <label for="exam-title">Exam title</label>
+              <label for="exam-title">Exam Title</label>
               <input id="exam-title" type="text" required />
 
               <label for="exam-description">Description</label>
-              <textarea id="exam-description" rows="3"></textarea>
+              <textarea id="exam-description" rows="2"></textarea>
 
               <label for="exam-questions">Questions (one per line)</label>
-              <textarea id="exam-questions" rows="8" required></textarea>
+              <textarea id="exam-questions" rows="4" required></textarea>
 
-              <button type="submit" class="button button-secondary">Publish exam</button>
+              <button type="submit" class="button button-primary">Publish Exam</button>
             </form>
           </div>
         </div>
 
         <div class="section-block">
-          <h3>Your students</h3>
+          <h3>Your Students</h3>
           <table class="data-table" id="teacher-student-table">
             <thead>
               <tr><th>Name</th><th>Email</th></tr>
@@ -135,10 +131,10 @@
         </div>
 
         <div class="section-block">
-          <h3>Your exams</h3>
+          <h3>Active Exams</h3>
           <table class="data-table" id="teacher-exam-table">
             <thead>
-              <tr><th>Title</th><th>Assigned</th><th>Created</th><th>Actions</th></tr>
+              <tr><th>Title</th><th>Students</th><th>Published</th><th>Actions</th></tr>
             </thead>
             <tbody></tbody>
           </table>
@@ -146,15 +142,10 @@
       </section>
 
       <section id="section-student" class="panel hidden">
-        <div class="panel-header">
-          <div>
-            <h2>Student Dashboard</h2>
-            <p class="subtitle">Open your assigned exams and submit your answer scripts.</p>
-          </div>
-        </div>
+        <h2 style="color: var(--primary); margin-bottom: 32px; font-size: 1.8rem;">Your Exams</h2>
 
         <div class="section-block">
-          <h3>Assigned exams</h3>
+          <h3>Available Exams</h3>
           <table class="data-table" id="student-exam-table">
             <thead>
               <tr><th>Exam</th><th>Status</th><th>Action</th></tr>
@@ -165,24 +156,24 @@
       </section>
 
       <section id="section-exam-detail" class="panel hidden">
-        <div class="panel-header">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px;">
           <div>
-            <h2 id="exam-detail-title"></h2>
+            <h2 id="exam-detail-title" style="color: var(--primary); margin: 0 0 12px 0; font-size: 1.8rem;"></h2>
             <p id="exam-detail-description" class="subtitle"></p>
           </div>
-          <button id="back-to-student" class="button button-tertiary">Back</button>
+          <button id="back-to-student" class="button button-secondary">← Back</button>
         </div>
 
         <div class="section-block">
-          <h3>Questions</h3>
+          <h3>Instructions & Questions</h3>
           <ol id="exam-detail-questions" class="question-list"></ol>
         </div>
 
         <div class="section-block">
-          <h3>Your answer script</h3>
+          <h3>Your Response</h3>
           <form id="form-submit-answer" class="form-grid">
-            <textarea id="student-answer" rows="10" required></textarea>
-            <button type="submit" class="button button-primary">Submit answer</button>
+            <textarea id="student-answer" placeholder="Enter your answer here..." rows="12" required></textarea>
+            <button type="submit" class="button button-primary" style="align-self: flex-start;">Submit Answer</button>
           </form>
         </div>
       </section>
