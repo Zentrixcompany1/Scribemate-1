@@ -166,7 +166,7 @@ async function ensureUserProfile(user) {
   const metadata = user.user_metadata || {};
   const profile = {
     id: user.id,
-    name: metadata.name || metadata.full_name || 'Scribemate user',
+    name: metadata.name || metadata.full_name || 'Scribe user',
     email: user.email,
     role: metadata.role || 'teacher',
     teacher_id: metadata.teacher_id || null,
