@@ -89,11 +89,20 @@ function initVoiceAssistant() {
   speechRecognition = new SpeechRecognition();
   speechRecognition.lang = 'en-US';
   speechRecognition.continuous = true;
-  speechRecognition.interimResults = false;
+  speechRecognition.interimResults = true;
   speechRecognition.maxAlternatives = 1;
 
   speechRecognition.addEventListener('result', (event) => {
-    const transcript = event.results[event.results.length - 1][0].transcript.trim();
+    let transcript = '';
+    
+    // Get interim results for faster response
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    
+    transcript = transcript.trim();
+    if (!transcript) return;
+    
     const normalized = transcript.toLowerCase();
 
     const hasWakeWord = wakeWords.some((word) => normalized.startsWith(word));
@@ -110,8 +119,10 @@ function initVoiceAssistant() {
     if (dictationMode) {
       const answerField = document.getElementById('student-answer');
       if (answerField) {
-        answerField.value = `${answerField.value}${answerField.value ? ' ' : ''}${transcript}`;
-        speakText('Dictation text added.');
+        if (event.results[event.results.length - 1].isFinal) {
+          // Only add when final result
+          answerField.value = `${answerField.value}${answerField.value ? ' ' : ''}${transcript}`;
+        }
       }
       return;
     }
@@ -119,12 +130,18 @@ function initVoiceAssistant() {
 
   speechRecognition.addEventListener('end', () => {
     if (voiceAssistantActive) {
-      startRecognition();
+      try {
+        startRecognition();
+      } catch (err) {
+        console.warn('Recognition restart error', err);
+      }
     }
   });
 
   speechRecognition.addEventListener('error', (event) => {
-    showToast('Voice assistant error: ' + event.error);
+    if (event.error !== 'no-speech' && event.error !== 'audio-capture') {
+      showToast('Voice error: ' + event.error);
+    }
   });
 }
 
