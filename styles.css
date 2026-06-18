@@ -148,7 +148,7 @@ textarea {
   height: 100%;
   background: linear-gradient(90deg, #34d399, #06b6d4);
   width: 0%;
-  transition: width 120ms linear;
+  transition: width 80ms linear;
 }
 
 .mic-status {

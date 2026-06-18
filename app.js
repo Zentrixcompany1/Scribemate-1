@@ -25,6 +25,7 @@ let analyser = null;
 let micStream = null;
 let micRaf = null;
 let committedAnswer = '';
+let isRecognizing = false;
 
 async function init() {
   bindEvents();
@@ -178,17 +179,22 @@ function toggleVoiceAssistant() {
 function startRecognition() {
   if (!speechRecognition) return;
   try {
+    if (isRecognizing) return;
+    isRecognizing = true;
     speechRecognition.start();
     // Start microphone level meter
     startMicMeter();
   } catch (err) {
     console.warn('Speech recognition start error', err);
+    isRecognizing = false;
   }
 }
 
 function stopRecognition() {
   if (!speechRecognition) return;
   try {
+    if (!isRecognizing) return;
+    isRecognizing = false;
     speechRecognition.stop();
     // Stop microphone level meter
     stopMicMeter();
@@ -206,7 +212,8 @@ function startMicMeter() {
     audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
     const source = audioContext.createMediaStreamSource(stream);
     analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
+    analyser.fftSize = 128; // smaller for faster updates
+    analyser.smoothingTimeConstant = 0.15; // quicker responsiveness
     source.connect(analyser);
     const dataArray = new Uint8Array(analyser.fftSize);
     const levelEl = document.getElementById('mic-level');
@@ -248,6 +255,17 @@ function stopMicMeter() {
   const statusEl = document.getElementById('mic-status');
   if (levelEl) levelEl.style.width = '0%';
   if (statusEl) statusEl.textContent = 'Idle';
+}
+
+// Prewarm microphone permission to avoid prompt/latency when starting recognition
+function prewarmMicPermission() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return Promise.resolve();
+  return navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+    // Immediately stop tracks but permission is granted for subsequent uses
+    try { stream.getTracks().forEach((t) => t.stop()); } catch (e) {}
+  }).catch((err) => {
+    console.warn('Prewarm mic permission failed', err);
+  });
 }
 
 function speakText(text) {
@@ -667,6 +685,8 @@ async function openStudentExam(examId) {
   // Auto-enable voice assistant for students in exam mode
   if (!voiceAssistantActive && speechRecognitionSupported) {
     voiceAssistantActive = true;
+    // Prewarm mic permission to avoid prompt latency
+    await prewarmMicPermission();
     startRecognition();
     if (voiceToggle) voiceToggle.textContent = 'Stop Voice';
     setVoiceStatus('Voice assistant active');
