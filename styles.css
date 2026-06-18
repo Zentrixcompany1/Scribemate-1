@@ -263,13 +263,13 @@ textarea {
 }
 
 .stat-label {
-  color: #000000;
+  color: #000000 !important;
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   font-weight: 700;
-  display: block;
+  display: block !important;
   margin-bottom: 8px;
 }
 
