@@ -35,7 +35,8 @@
       <section id="section-auth" class="panel">
         <div class="auth-layout">
           <div class="auth-card">
-            <h2 style="color: var(--primary); margin-bottom: 24px; font-size: 1.4rem;">Educator Login</h2>
+            <h2 style="color: var(--primary); margin-bottom: 16px; font-size: 1.4rem;">Educator & Student Login</h2>
+            <p class="subtitle" style="margin-bottom: 18px;">Teachers and students sign in with the same secure portal. Students use credentials issued by their teacher only.</p>
             <form id="form-login" class="form-grid">
               <label for="login-email">Email Address</label>
               <input id="login-email" type="email" placeholder="your@email.com" required />
@@ -48,7 +49,7 @@
           </div>
 
           <div class="auth-card">
-            <h2 style="color: var(--primary); margin-bottom: 24px; font-size: 1.4rem;">Teacher Registration</h2>
+            <h2 style="color: var(--primary); margin-bottom: 24px; font-size: 1.4rem;">Teacher Registration (Educators Only)</h2>
             <form id="form-register" class="form-grid">
               <label for="register-name">Full Name</label>
               <input id="register-name" type="text" placeholder="John Educator" required />
@@ -59,7 +60,7 @@
               <label for="register-password">Password</label>
               <input id="register-password" type="password" placeholder="••••••••" required />
 
-              <small style="color: var(--text-secondary);">Only teachers can register and enroll students. Student login credentials are issued by the teacher.</small>
+              <small style="color: var(--text-secondary);">Only teachers may create teacher and student accounts. Student login credentials are created and shared by teachers only.</small>
               <button type="submit" class="button button-primary" style="margin-top: 12px;">Create Account</button>
             </form>
           </div>
@@ -145,7 +146,8 @@
 
       <section id="section-student" class="panel hidden">
         <h2 style="color: var(--primary); margin-bottom: 32px; font-size: 1.8rem;">Student Portal</h2>
-        <p class="subtitle">The student portal mirrors the teacher portal in structure and professionalism. Students review assigned exams, view uploaded question files, and write exam responses directly in the portal.</p>
+        <p class="subtitle">The student portal mirrors the teacher portal in structure and professionalism. Students review assigned exams, download uploaded question files as needed, and write exam responses directly in the portal.</p>
+        <p class="subtitle" style="margin-top: 8px;">Students sign in with credentials issued by their teacher only; students cannot self-register.</p>
 
         <div class="stats-grid">
           <div class="card">
@@ -187,6 +189,7 @@
           <h3>Exam Questions</h3>
           <div id="exam-detail-questions" style="padding: 20px; background: rgba(212, 175, 55, 0.08); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 24px;">
             <p id="exam-questions-info" style="color: var(--text-secondary); margin: 0; line-height: 1.6;">Questions will be displayed below. Read all questions carefully before starting your response.</p>
+            <div id="exam-questions-file-link" style="display: none; margin: 16px 0;"></div>
             <ol id="exam-questions-list" class="question-list" style="display: none;"></ol>
           </div>
         </div>

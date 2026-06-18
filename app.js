@@ -328,16 +328,18 @@ async function openStudentExam(examId) {
   currentExam = exam;
   document.getElementById('exam-detail-title').textContent = exam.title;
   document.getElementById('exam-detail-description').textContent = exam.description || 'Instructions will appear here.';
-  
+
   const questionsInfo = document.getElementById('exam-questions-info');
   const questionsList = document.getElementById('exam-questions-list');
-  
+  const questionsFileLink = document.getElementById('exam-questions-file-link');
+
   const questions = Array.isArray(exam.questions)
     ? exam.questions
     : String(exam.questions || '').split('\n').map((q) => q.trim()).filter(Boolean);
 
   if (questions.length) {
     questionsInfo.style.display = 'none';
+    questionsFileLink.style.display = 'none';
     questionsList.style.display = 'block';
     questionsList.innerHTML = questions
       .map((q) => `<li>${escapeHtml(q)}</li>`)
@@ -345,6 +347,15 @@ async function openStudentExam(examId) {
   } else {
     questionsInfo.style.display = 'block';
     questionsList.style.display = 'none';
+    if (exam.questions_file_url && exam.questions_file_name) {
+      questionsFileLink.style.display = 'block';
+      questionsFileLink.innerHTML = `
+        <strong>Questions file:</strong> <a href="${escapeHtml(exam.questions_file_url)}" target="_blank" rel="noreferrer noopener">${escapeHtml(exam.questions_file_name)}</a>
+        <div style="margin-top: 8px; color: var(--text-secondary);">Open the uploaded questions file to read the exam content.</div>
+      `;
+    } else {
+      questionsFileLink.style.display = 'none';
+    }
   }
 
   const { data: submission } = await supabaseClient
@@ -374,31 +385,41 @@ async function handleCreateExam(event) {
     return;
   }
 
-  let questionsText = '';
-  try {
-    questionsText = await questionsFile.text();
-  } catch (err) {
-    showToast('Unable to read file. Please use a text-based format (TXT, PDF text, or DOC).');
+  const examId = crypto.randomUUID();
+  const filePath = `exams/${examId}/${questionsFile.name}`;
+  const { error: uploadError } = await supabaseClient.storage.from('exam-files').upload(filePath, questionsFile, { cacheControl: '3600', upsert: true });
+  if (uploadError) {
+    console.error('Storage upload error:', uploadError);
+    showToast('Unable to upload the questions file. Check your Supabase storage settings.');
     return;
   }
 
-  const questionsArray = questionsText
-    .split('\n')
-    .map((q) => q.trim())
-    .filter(Boolean);
+  const publicUrlResult = supabaseClient.storage.from('exam-files').getPublicUrl(filePath);
+  const questionsFileUrl = publicUrlResult?.data?.publicUrl || null;
 
-  if (!questionsArray.length) {
-    showToast('Questions file appears to be empty.');
-    return;
+  let questionsArray = [];
+  if (questionsFile.type === 'text/plain' || questionsFile.name.toLowerCase().endsWith('.txt')) {
+    try {
+      const questionsText = await questionsFile.text();
+      questionsArray = questionsText
+        .split('\n')
+        .map((q) => q.trim())
+        .filter(Boolean);
+    } catch (err) {
+      console.warn('Unable to extract text from questions file:', err);
+    }
   }
 
   const students = await loadTeacherStudents();
   const { error } = await supabaseClient.from('exams').insert([
     {
-      id: crypto.randomUUID(),
+      id: examId,
       title,
       description,
       questions: questionsArray,
+      questions_file_name: questionsFile.name,
+      questions_file_path: filePath,
+      questions_file_url: questionsFileUrl,
       teacher_id: currentProfile.id,
       assigned_student_ids: students.map((student) => student.id),
     },
@@ -447,9 +468,7 @@ async function handleCreateStudent(event) {
     return;
   }
 
-  const activeUser = await getCurrentUser();
-  if (signup.data.session && activeUser?.id === studentId) {
-    const profileResult = await supabaseClient.from('profiles').insert([
+  const profileResult = await supabaseClient.from('profiles').insert([
       {
         id: studentId,
         name,
@@ -459,11 +478,14 @@ async function handleCreateStudent(event) {
       },
     ]);
 
-    if (profileResult.error) {
-      showToast('Unable to save student profile.');
-      return;
-    }
+  if (profileResult.error) {
+    console.error('Student profile insert error:', profileResult.error);
+    showToast('Unable to save student profile. Please verify the student account was created in Supabase.');
+    return;
+  }
 
+  const activeUser = await getCurrentUser();
+  if (signup.data.session && activeUser?.id === studentId) {
     await supabaseClient.auth.signOut();
     const reLogin = await supabaseClient.auth.signInWithPassword({ email: teacherEmail, password: teacherPassword });
     if (reLogin.error) {

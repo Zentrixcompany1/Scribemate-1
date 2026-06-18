@@ -6,11 +6,11 @@ Scribe is a government-grade examination platform for educational institutions. 
 - **Teacher Registration & Dashboard:** Teachers register and manage their institution's exams
 - **Student Enrollment:** Teachers create student accounts and provide login credentials; students cannot self-register
 - **File-Based Exam Questions:** Exam questions can be added as uploaded files in PDF, DOC, DOCX, or TXT format
+- **Teacher-Controlled Student Credentials:** Only students registered by a teacher receive login details
 - **Automatic Assignment:** Students are auto-assigned to exams once created and enrolled
-- **Professional Student Portal:** Students view assigned exams, read uploaded question files, and write answers within the portal
+- **Professional Student Portal:** Students view assigned exams, download uploaded question files, and write answers within the portal
 - **Secure Exam Taking:** Students complete examinations with controlled access and submission tracking
 - **Response Management:** Teachers view all student submissions in one place
-- **Credential Control:** Only teacher-created students can access the system
 
 ## Run locally
 1. Open `config.js` and update `SUPABASE_URL` and `SUPABASE_ANON_KEY` with your Supabase project values.
@@ -60,7 +60,11 @@ create table submissions (
 4. Save changes
 
 **Important:** This setting is essential for smooth operation. Students receive login credentials from their teacher; they do not self-register. Only teachers can register student accounts and distribute credentials.
-
+### Student login procedure
+1. Teacher registers an educator account.
+2. Teacher creates student accounts from the teacher dashboard.
+3. The teacher shares the student email and password securely with each student.
+4. Students log in using the same portal and access assigned exams.
 ### File Upload Configuration
 The exam questions file should be in one of these formats:
 - **.txt** — Plain text (one question per line)
