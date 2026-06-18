@@ -249,6 +249,17 @@ function startMicMeter() {
       const percent = Math.min(100, Math.max(0, Math.round(rms * 1200)));
       if (levelEl) levelEl.style.width = percent + '%';
       if (statusEl) statusEl.textContent = percent > 4 ? 'Detecting' : 'Idle';
+      // Auto-enable dictation for students in exam if sound detected
+      try {
+        const inExam = sections && sections.examDetail && !sections.examDetail.classList.contains('hidden');
+        if (percent > 12 && !dictationMode && currentProfile?.role === 'student' && inExam) {
+          dictationMode = true;
+          committedAnswer = (document.getElementById('student-answer')?.value || '');
+          if (statusEl) statusEl.textContent = 'Dictating';
+        }
+      } catch (e) {
+        // ignore
+      }
       micRaf = requestAnimationFrame(update);
     }
     update();
