@@ -116,6 +116,46 @@ textarea {
   font-weight: 500;
 }
 
+.voice-panel {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.mic-activity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mic-label {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.mic-bar {
+  width: 220px;
+  height: 12px;
+  background: rgba(13,59,102,0.06);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(13,59,102,0.08);
+}
+
+.mic-level {
+  height: 100%;
+  background: linear-gradient(90deg, #34d399, #06b6d4);
+  width: 0%;
+  transition: width 120ms linear;
+}
+
+.mic-status {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 .top-nav {
   display: flex;
   flex-wrap: wrap;

@@ -20,6 +20,11 @@ let dictationMode = false;
 let speechRecognition = null;
 let speechRecognitionSupported = false;
 let speechSynthesisSupported = 'speechSynthesis' in window;
+let audioContext = null;
+let analyser = null;
+let micStream = null;
+let micRaf = null;
+let committedAnswer = '';
 
 async function init() {
   bindEvents();
@@ -115,13 +120,19 @@ function initVoiceAssistant() {
       return;
     }
 
-    // In dictation mode, add non-command text to answer field
+    // In dictation mode, show interim text immediately and commit on final
     if (dictationMode) {
       const answerField = document.getElementById('student-answer');
       if (answerField) {
-        if (event.results[event.results.length - 1].isFinal) {
-          // Only add when final result
-          answerField.value = `${answerField.value}${answerField.value ? ' ' : ''}${transcript}`;
+        const lastResult = event.results[event.results.length - 1];
+        const interimText = transcript;
+        if (lastResult.isFinal) {
+          // Commit final text to committedAnswer
+          committedAnswer = `${committedAnswer}${committedAnswer ? ' ' : ''}${interimText}`.trim();
+          answerField.value = committedAnswer;
+        } else {
+          // Show interim without committing
+          answerField.value = `${committedAnswer}${committedAnswer ? ' ' : ''}${interimText}`.trim();
         }
       }
       return;
@@ -168,6 +179,8 @@ function startRecognition() {
   if (!speechRecognition) return;
   try {
     speechRecognition.start();
+    // Start microphone level meter
+    startMicMeter();
   } catch (err) {
     console.warn('Speech recognition start error', err);
   }
@@ -177,9 +190,64 @@ function stopRecognition() {
   if (!speechRecognition) return;
   try {
     speechRecognition.stop();
+    // Stop microphone level meter
+    stopMicMeter();
   } catch (err) {
     console.warn('Speech recognition stop error', err);
   }
+}
+
+function startMicMeter() {
+  // If already running, skip
+  if (micStream || micRaf) return;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+    micStream = stream;
+    audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(stream);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    const dataArray = new Uint8Array(analyser.fftSize);
+    const levelEl = document.getElementById('mic-level');
+    const statusEl = document.getElementById('mic-status');
+    function update() {
+      if (!analyser) return;
+      analyser.getByteTimeDomainData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        const v = dataArray[i] - 128;
+        sum += v * v;
+      }
+      const rms = Math.sqrt(sum / dataArray.length) / 128;
+      const percent = Math.min(100, Math.max(0, Math.round(rms * 200)));
+      if (levelEl) levelEl.style.width = percent + '%';
+      if (statusEl) statusEl.textContent = percent > 6 ? 'Detecting' : 'Idle';
+      micRaf = requestAnimationFrame(update);
+    }
+    update();
+  }).catch((err) => {
+    console.warn('Mic meter error', err);
+  });
+}
+
+function stopMicMeter() {
+  if (micRaf) {
+    cancelAnimationFrame(micRaf);
+    micRaf = null;
+  }
+  if (micStream) {
+    micStream.getTracks().forEach((t) => t.stop());
+    micStream = null;
+  }
+  if (audioContext) {
+    try { audioContext.close(); } catch (e) {}
+    audioContext = null;
+  }
+  const levelEl = document.getElementById('mic-level');
+  const statusEl = document.getElementById('mic-status');
+  if (levelEl) levelEl.style.width = '0%';
+  if (statusEl) statusEl.textContent = 'Idle';
 }
 
 function speakText(text) {
@@ -590,7 +658,10 @@ async function openStudentExam(examId) {
     .eq('student_id', currentProfile.id)
     .single();
 
-  document.getElementById('student-answer').value = submission?.answer || '';
+  // Maintain committedAnswer separately so we can show interim text quickly
+  committedAnswer = submission?.answer || '';
+  const answerFieldEl = document.getElementById('student-answer');
+  if (answerFieldEl) answerFieldEl.value = committedAnswer;
   showSection('examDetail');
   
   // Auto-enable voice assistant for students in exam mode
