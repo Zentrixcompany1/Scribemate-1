@@ -584,14 +584,15 @@ async function handleCreateExam(event) {
 
   const examId = crypto.randomUUID();
   const filePath = `exams/${examId}/${questionsFile.name}`;
-  const { error: uploadError } = await supabaseClient.storage.from('exam-files').upload(filePath, questionsFile, { cacheControl: '3600', upsert: true });
+  // Create 'exams' bucket in Supabase Storage if it doesn't exist
+  const { error: uploadError } = await supabaseClient.storage.from('exams').upload(filePath, questionsFile, { cacheControl: '3600', upsert: true });
   if (uploadError) {
     console.error('Storage upload error:', uploadError);
     showToast('Unable to upload the questions file. Check your Supabase storage settings.');
     return;
   }
 
-  const publicUrlResult = supabaseClient.storage.from('exam-files').getPublicUrl(filePath);
+  const publicUrlResult = supabaseClient.storage.from('exams').getPublicUrl(filePath);
   const questionsFileUrl = publicUrlResult?.data?.publicUrl || null;
 
   let questionsArray = [];
