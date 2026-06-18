@@ -26,6 +26,8 @@ let micStream = null;
 let micRaf = null;
 let committedAnswer = '';
 let isRecognizing = false;
+let commitTimer = null;
+const COMMIT_DELAY = 1200; // ms: commit interim text after short silence
 
 async function init() {
   bindEvents();
@@ -121,26 +123,38 @@ function initVoiceAssistant() {
       return;
     }
 
-    // In dictation mode, show interim text immediately and commit on final
+    // In dictation mode, show interim text immediately and commit on final or short silence
     if (dictationMode) {
       const answerField = document.getElementById('student-answer');
+      const lastResult = event.results[event.results.length - 1];
+      const interimText = transcript;
       if (answerField) {
-        const lastResult = event.results[event.results.length - 1];
-        const interimText = transcript;
-        if (lastResult.isFinal) {
-          // Commit final text to committedAnswer
-          committedAnswer = `${committedAnswer}${committedAnswer ? ' ' : ''}${interimText}`.trim();
-          answerField.value = committedAnswer;
-        } else {
-          // Show interim without committing
-          answerField.value = `${committedAnswer}${committedAnswer ? ' ' : ''}${interimText}`.trim();
-        }
+        // Show interim (merged with previously committed text)
+        answerField.value = `${committedAnswer}${committedAnswer ? ' ' : ''}${interimText}`.trim();
       }
+
+      // If final result from engine, commit immediately
+      if (lastResult.isFinal) {
+        committedAnswer = `${committedAnswer}${committedAnswer ? ' ' : ''}${interimText}`.trim();
+        if (answerField) answerField.value = committedAnswer;
+        if (commitTimer) { clearTimeout(commitTimer); commitTimer = null; }
+        return;
+      }
+
+      // Otherwise, reset the commit timer so short pauses commit interim quickly
+      if (commitTimer) clearTimeout(commitTimer);
+      commitTimer = setTimeout(() => {
+        committedAnswer = `${committedAnswer}${committedAnswer ? ' ' : ''}${interimText}`.trim();
+        if (answerField) answerField.value = committedAnswer;
+        commitTimer = null;
+      }, COMMIT_DELAY);
       return;
     }
   });
 
   speechRecognition.addEventListener('end', () => {
+    // mark recognizing false; restart if assistant still active
+    isRecognizing = false;
     if (voiceAssistantActive) {
       try {
         startRecognition();
@@ -148,6 +162,10 @@ function initVoiceAssistant() {
         console.warn('Recognition restart error', err);
       }
     }
+  });
+
+  speechRecognition.addEventListener('start', () => {
+    isRecognizing = true;
   });
 
   speechRecognition.addEventListener('error', (event) => {
@@ -212,8 +230,8 @@ function startMicMeter() {
     audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
     const source = audioContext.createMediaStreamSource(stream);
     analyser = audioContext.createAnalyser();
-    analyser.fftSize = 128; // smaller for faster updates
-    analyser.smoothingTimeConstant = 0.15; // quicker responsiveness
+    analyser.fftSize = 64; // even smaller for lower latency
+    analyser.smoothingTimeConstant = 0.05; // more responsive to sudden sound
     source.connect(analyser);
     const dataArray = new Uint8Array(analyser.fftSize);
     const levelEl = document.getElementById('mic-level');
@@ -227,9 +245,10 @@ function startMicMeter() {
         sum += v * v;
       }
       const rms = Math.sqrt(sum / dataArray.length) / 128;
-      const percent = Math.min(100, Math.max(0, Math.round(rms * 200)));
+      // increase sensitivity multiplier
+      const percent = Math.min(100, Math.max(0, Math.round(rms * 1200)));
       if (levelEl) levelEl.style.width = percent + '%';
-      if (statusEl) statusEl.textContent = percent > 6 ? 'Detecting' : 'Idle';
+      if (statusEl) statusEl.textContent = percent > 4 ? 'Detecting' : 'Idle';
       micRaf = requestAnimationFrame(update);
     }
     update();
